@@ -1,0 +1,1 @@
+# SpotiType (work in progress...)

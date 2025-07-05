@@ -24,7 +24,7 @@ function UploadForm() {
 
   return (
     <div className="w-[90%] mx-auto mt-10 px-6 py-14 bg-[#917843] rounded-xl shadow gap-6 flex flex-col items-center">
-      <h3 className="font-bold text-gray-100 text-4xl">Inizia ora la tua analisi musicale</h3>
+      <h3 className="kanit-bold text-gray-100 text-4xl">Inizia ora la tua analisi musicale</h3>
       <p className="font-semibold text-2xl text-gray-300">Scegli come vuoi condividere i tuoi gusti musicali con noi</p>
       <div className="flex gap-2 mb-4 p-2 bg-[#282b2e] w-[80%] rounded-lg">
         <button
