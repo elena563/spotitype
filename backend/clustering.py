@@ -17,7 +17,7 @@ def run_clustering(data_path, n_clusters):
         pickle.dump(model, f)
 
     # save clustering
-    df.to_csv('data/clustered_data1.csv', index=False)
+    df.to_csv('data/clustered_data.csv', index=False)
 
 
     pca = PCA(n_components=2)
