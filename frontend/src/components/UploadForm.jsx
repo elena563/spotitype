@@ -44,6 +44,7 @@ function UploadForm() {
       <form onSubmit={handleSubmit} className="space-y-6 w-[80%] text-left">
         {activeTab === 'playlist' && (
           <div><p className="font-semibold text-2xl text-gray-100 mb-4">URL della Playlist Spotify</p>
+          <input type="hidden" name="form_type" value="playlist_form" />
           <input
             type="text"
             name="playlistField"
@@ -56,6 +57,7 @@ function UploadForm() {
 
         {activeTab === 'songs' && (
           <div><p className="font-semibold text-2xl text-gray-100 mb-4">Le tue 5 canzoni preferite</p>
+          <input type="hidden" name="form_type" value="songs_form" />
             <p className="font-semibold text-lg text-gray-300 mb-2">Canzone 1</p>
             <input
             type="text"
