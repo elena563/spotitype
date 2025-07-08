@@ -1,14 +1,21 @@
 import os
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
+from spotipy.oauth2 import SpotifyOAuth
 import pandas as pd
 import pickle
+import requests
+from dotenv import load_dotenv
 
-client_id = os.environ['CLIENT_ID']
-client_secret = os.environ['CLIENT_SECRET']
+load_dotenv()
+client_id = os.getenv('CLIENT_ID')
+client_secret = os.getenv('CLIENT_SECRET')
 
-auth_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
-sp = spotipy.Spotify(auth_manager=auth_manager)
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
+    client_id=client_id,
+    client_secret=client_secret,
+    redirect_uri="http://127.0.0.1:8888/callback",
+    scope="user-library-read"
+))
 
 
 def get_from_playlist(playlist_id):
@@ -32,17 +39,41 @@ def search_track(title):
     return items[0]['id']
 
 
-def get_features_dataframe(track_ids):
-    features_list = sp.audio_features(tracks=track_ids)
+def get_features_dataframe(ids_list):
+    url = "https://api.reccobeats.com/v1/track"
+    params = {
+        "ids": ids_list 
+    }
 
-    df = pd.DataFrame(features_list)
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        print("Errore nella richiesta:", response.status_code)
+        print(response.text)
+        return None
 
-    features = ['danceability', 'energy', 'valence', 'acousticness',
-                    'instrumentalness']
+    info = response.json()
+    all_features = []
 
-    df = df[features]
+    for traccia in info['content']:
+        rb_id = traccia['id']
+        url_feat = f'https://api.reccobeats.com/v1/track/{rb_id}/audio-features'
+        headers = { 'Accept': 'application/json' }
+        r = requests.get(url_feat, headers=headers)
+        if r.status_code == 200:
+            feat = r.json()
+            all_features.append(feat)
+        else:
+            print(f"Errore per traccia {rb_id}: {r.status_code}")
 
-    # Scala i dati con il tuo scaler salvato
+    if all_features:
+        df = pd.DataFrame(all_features)
+        features = ['danceability', 'energy', 'valence', 'acousticness', 'instrumentalness']
+        df = df[features]
+    else:
+        print("Nessuna feature trovata")
+        return None
+
+    # data scaling
     with open('models/scaler.pkl', 'rb') as f:
         scaler = pickle.load(f)
 

@@ -1,9 +1,12 @@
 from flask import Flask, render_template, request
+from flask_cors import CORS
+from flask import jsonify
 import pickle
 from spotify_utils import get_from_playlist, search_track, get_features_dataframe
 
 # configure application
 app = Flask(__name__)
+CORS(app)
 app.debug = True
 
 # prevent caching
@@ -15,30 +18,29 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["POST"])
 def index():
-    if request.method == 'POST':
-        form_type = request.form.get('form_type')
+        data = request.get_json()
+        form_type = data.get('form_type')
         with open('models/random_forest.pkl', 'rb') as f:
             model = pickle.load(f)
 
 
-
         if form_type == 'playlist_form':
-            playlist_url = request.form.get('playlistField')
+            playlist_url = data.get('playlistField')
 
             playlist_id = playlist_url.split("/")[-1].split("?")[0]
 
             tracks = get_from_playlist(playlist_id)
             if not tracks:
-                return render_template("index.html", error='Playlist URL is invalid or playlist is empty')
+                 return jsonify({"error": "Playlist URL is invalid or playlist is empty"}), 400
 
-        elif form_type == 'playlist_form':
-            songs = [request.form.get('song1'),
-                    request.form.get('song2'),
-                    request.form.get('song3'),
-                    request.form.get('song4'),
-                    request.form.get('song5')]
+        elif form_type == 'songs_form':
+            songs = [data.get('song1'),
+                    data.get('song2'),
+                    data.get('song3'),
+                    data.get('song4'),
+                    data.get('song5')]
 
             tracks = []
             for title in songs:
@@ -46,14 +48,15 @@ def index():
                 if track:
                     tracks.append(track)
                 else:
-                    return render_template("index.html", error='At least one song was not found')
+                    return jsonify({"error": "At least one song was not found"}), 400
 
             
         X_test = get_features_dataframe(tracks)
+        print(X_test)
         y_pred = model.predict(X_test) # output will be 0, 1, 2, 3, 4 or 5
+        print(y_pred)
 
-        return render_template("index.html", result=y_pred)
-
-    else:
-        return render_template("index.html")
+        return jsonify({"result": y_pred})
     
+if __name__ == "__main__":
+    app.run(debug=True)

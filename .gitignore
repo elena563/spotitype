@@ -25,3 +25,6 @@ dist-ssr
 
 *.pkl
 *.pyc
+backend/debug.ipynb
+backend/.cache
+backend/.env
