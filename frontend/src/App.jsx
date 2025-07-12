@@ -1,6 +1,5 @@
 import React from "react";
 import UploadForm from "./components/UploadForm";
-import Type0 from "./components/result/Type0";
 
 function App() {
   
@@ -15,9 +14,6 @@ function App() {
       </main>
       <section className="pt-10 pb-20">
         <UploadForm />
-      </section>
-      <section className="pt-10 pb-20">
-        <Type0 />
       </section>
       <footer className="pt-10 pb-2 text-white bg-[#1DB954]">
         <p>SpotiType - Project by <a href="https://elenazen.it" className="text-white underline">Elena Zen</a></p>

@@ -52,11 +52,12 @@ def index():
 
             
         X_test = get_features_dataframe(tracks)
-        print(X_test)
-        y_pred = model.predict(X_test) # output will be 0, 1, 2, 3, 4 or 5
+        X_test1= X_test.drop(columns=['liveness', 'speechiness', 'tempo'])
+        X_test_avg = X_test1.mean().to_frame().T
+        y_pred = model.predict(X_test_avg) # output will be 0, 1, 2, 3, 4 or 5
         print(y_pred)
 
-        return jsonify({"result": y_pred})
+        return jsonify({"result": y_pred[0].item()})
     
 if __name__ == "__main__":
     app.run(debug=True)
