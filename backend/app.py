@@ -55,9 +55,10 @@ def index():
         X_test1= X_test.drop(columns=['liveness', 'speechiness', 'tempo'])
         X_test_avg = X_test1.mean().to_frame().T
         y_pred = model.predict(X_test_avg) # output will be 0, 1, 2, 3, 4 or 5
-        print(y_pred)
 
-        return jsonify({"result": y_pred[0].item()})
+        features_dict = X_test_avg.iloc[0].to_dict()
+
+        return jsonify({"result": y_pred[0].item(), "features": features_dict})
     
 if __name__ == "__main__":
     app.run(debug=True)
