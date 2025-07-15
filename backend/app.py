@@ -32,7 +32,7 @@ def index():
             playlist_id = playlist_url.split("/")[-1].split("?")[0]
 
             tracks = get_from_playlist(playlist_id)
-            if not tracks:
+            if tracks is None or len(tracks) == 0:
                  return jsonify({"error": "Playlist URL is invalid or playlist is empty"}), 400
 
         elif form_type == 'songs_form':
@@ -41,7 +41,6 @@ def index():
                     data.get('song3'),
                     data.get('song4'),
                     data.get('song5')]
-
             tracks = []
             for title in songs:
                 track = search_track(title) 

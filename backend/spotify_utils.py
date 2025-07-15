@@ -1,7 +1,8 @@
 import os
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials
 from requests.adapters import HTTPAdapter
+from spotipy.exceptions import SpotifyException
 from requests.sessions import Session
 import pandas as pd
 import pickle
@@ -31,9 +32,17 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     requests_session=session
 )
 
+sp2 = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
+    client_id=client_id,
+    client_secret=client_secret
+))
+
 
 def get_from_playlist(playlist_id):
-    results = sp.playlist_tracks(playlist_id)
+    try:
+        results = sp.playlist_tracks(playlist_id)
+    except SpotifyException:
+        return None
     tracks = results['items']
 
     track_ids = []
@@ -46,7 +55,7 @@ def get_from_playlist(playlist_id):
 
 
 def search_track(title):
-    results = sp.search(q=title, limit=1, type='track')
+    results = sp2.search(q=title, limit=1, type='track')
     items = results.get('tracks', {}).get('items', [])
     if not items:
         return None

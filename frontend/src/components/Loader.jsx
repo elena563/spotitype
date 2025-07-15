@@ -52,14 +52,6 @@ const StyledWrapper = styled.div`
     transition: ease 0.2s;
   }
 
-  .wave-menu:hover > li {
-    background: #282b2e;
-  }
-
-  .wave-menu:hover {
-    background: #1DB954;
-  }
-
   .wave-menu li:nth-child(2) {
     animation-name: wave2;
     animation-delay: 0.2s;

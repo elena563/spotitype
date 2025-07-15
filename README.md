@@ -8,7 +8,11 @@ To obtain user's playlists or songs for testing the model, it uses Spotify API f
 However, Spotify's function for audio features was recently deprecated, so the [ReccoBeats API](https://reccobeats.com/docs/apis/reccobeats-api) was used to extract values.
 
 
-#### Project Structure
+### App Usage (soon)
+
+
+
+### Project Structure
 ```
 /root  
 │  
@@ -39,7 +43,33 @@ However, Spotify's function for audio features was recently deprecated, so the [
 ```
 
 
-#### Technologies:
+### Technologies:
 
-Frontend: ReactJS (Vite), libraries: Recharts, Lucide (for icons)  
-Backend: Python, libraries: Flask, Scikit-Learn, Pandas, NumPy, requests
+Frontend:  
+[![React][React.js]][React-url]  
+[![Tailwind CSS][Tailwind-icon]][Tailwind-url]
+libraries: Recharts, Lucide (for icons), styled-components (for Loader)  
+
+Backend:  
+[![Flask][Flask-icon]][Flask-url] 
+[![Python][Python-icon]][Python-url] 
+libraries: Scikit-Learn, Pandas, NumPy, requests, Jupyter Notebook
+
+
+### Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+
+## Contact
+
+Elena Zen - [My Portfolio Website](https://elenazen.it) - info.elenazen@gmail.com

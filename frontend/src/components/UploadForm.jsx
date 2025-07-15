@@ -107,7 +107,15 @@ function UploadForm() {
     if (activeTab === "playlist_form") {
       payload.playlistField = playlistField;
     } else if (activeTab === "songs_form") {
-      payload.songs = Object.values(songs);
+      payload = {
+        ...payload,
+        song1: songs.song1,
+        song2: songs.song2,
+        song3: songs.song3,
+        song4: songs.song4,
+        song5: songs.song5,
+      };
+
     }
 
     fetch("http://localhost:5000/", {
@@ -115,15 +123,25 @@ function UploadForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) {
-        setError(data.error);
+
+    .then(async (res) => {
+    const contentType = res.headers.get("content-type");
+
+    let data;
+    if (contentType && contentType.includes("application/json")) {
+      data = await res.json();
+    } else {
+      const text = await res.text();
+      throw new Error(text || "Errore generico");
+    }
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong.");
         setResult(null);
         setFeatures(null);
       } else {
         setResult(data.result);
-        setFeatures(data.features)
+        setFeatures(data.features);
         setError("");
       }
       setLoading(false);
@@ -238,7 +256,13 @@ function UploadForm() {
       </div>
 
       <div>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {error && (
+            <div className='flex justify-center'>
+              <p className="py-3 px-10 max-w-md font-bold bg-red-100 text-red-500 text-center rounded shadow border-2 border-red-500">
+                {error}
+              </p>
+            </div>
+          )}
           {result && features &&
           <div>
             <h3 className="text-center kanit-bold text-4xl mb-8 mt-16 text-white">Your Type is...</h3>

@@ -20,7 +20,7 @@ const Type = ({ features, data }) => {
                         {data.songs} 
                     </p>
                 </div>
-                <ResultChart data={features}/>
+                <ResultChart features={features}/>
             </div>
         </div>
     )
