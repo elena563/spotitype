@@ -1,4 +1,4 @@
-# SpotiType (work in progress...)
+# SpotiType
 
 SpotiType is a web application that, given a Spotify playlist or a list of 5 songs, can tell you what kind of listener you are.
 
@@ -8,8 +8,8 @@ To obtain user's playlists or songs for testing the model, it uses Spotify API f
 However, Spotify's function for audio features was recently deprecated, so the [ReccoBeats API](https://reccobeats.com/docs/apis/reccobeats-api) was used to extract values.
 
 
-### App Usage (soon)
-
+### App Usage
+You can now use SpotiType [here](https://spotitype.vercel.app)!
 
 
 ### Project Structure
