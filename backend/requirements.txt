@@ -4,3 +4,5 @@ pandas
 spotipy
 flask
 flask-cors
+dotenv
+requests
