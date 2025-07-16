@@ -59,5 +59,5 @@ def index():
 
         return jsonify({"result": y_pred[0].item(), "features": features_dict})
     
-if __name__ == "__main__":
-    app.run(debug=True)
+#if __name__ == "__main__":
+#    app.run(debug=True)
