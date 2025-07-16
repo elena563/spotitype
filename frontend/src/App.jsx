@@ -16,7 +16,7 @@ function App() {
         <UploadForm />
       </section>
       <footer className="pt-10 pb-2 text-white bg-[#1DB954]">
-        <p>SpotiType - Project by <a href="https://elenazen.it" className="text-white underline">Elena Zen</a></p>
+        <p>SpotiType - Project by <a href="https://elenazen.it" className="text-white underline">Elena Zen</a> - Code available on <a href="https://github.com/elena563/spotitype" className="text-white underline">GitHub</a></p>
       </footer>
     </div>
   );
