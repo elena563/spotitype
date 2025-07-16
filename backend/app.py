@@ -18,8 +18,10 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-@app.route("/", methods=["POST"])
+@app.route("/", methods=["GET, POST"])
 def index():
+        if request.method == "GET":
+            return "OK", 200
         data = request.get_json()
         form_type = data.get('form_type')
         with open('models/random_forest.pkl', 'rb') as f:
