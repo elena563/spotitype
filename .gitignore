@@ -23,7 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-*.pkl
 *.pyc
 backend/debug.ipynb
 backend/.cache
