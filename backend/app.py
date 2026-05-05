@@ -3,7 +3,10 @@ from flask import Flask, request
 from flask_cors import CORS
 from flask import jsonify
 import pickle
+from marshmallow import ValidationError
+
 from spotify_utils import get_from_playlist, search_track, get_features_dataframe
+from schemas import PlaylistFormSchema, SongsFormSchema
 
 # configure application
 app = Flask(__name__)
@@ -50,7 +53,12 @@ def index():
             raise APIError("Invalid or missing form_type", 400)
 
         if form_type == 'playlist_form':
-            playlist_url = data.get('playlistField')
+            try:
+                validated = PlaylistFormSchema().load(data)
+            except ValidationError as err:
+                raise APIError(f"Invalid input: {err.messages}", 400)
+            
+            playlist_url = validated['playlistField']
 
             playlist_id = playlist_url.split("/")[-1].split("?")[0]
 
@@ -59,11 +67,12 @@ def index():
                 raise APIError("Playlist URL is invalid or playlist is empty", 400)
 
         elif form_type == 'songs_form':
-            songs = [data.get('song1'),
-                    data.get('song2'),
-                    data.get('song3'),
-                    data.get('song4'),
-                    data.get('song5')]
+            try:
+                validated = SongsFormSchema().load(data)
+            except ValidationError as err:
+                raise APIError(f"Invalid input: {err.messages}", 400)
+            
+            songs = [validated['song1'], validated['song2'], validated['song3'], validated['song4'], validated['song5']]
             tracks = []
             for title in songs:
                 track = search_track(title) 

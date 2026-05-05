@@ -8,3 +8,4 @@ dotenv
 requests
 seaborn
 matplotlib
+marshmallow
