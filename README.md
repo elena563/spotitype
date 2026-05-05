@@ -12,6 +12,19 @@ However, Spotify's function for audio features was recently deprecated, so the [
 You can now use SpotiType [here](https://spotitype.vercel.app)!
 
 
+### Technologies
+
+#### Frontend:  
+[![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)  
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)  
+**Libraries:** Recharts, Lucide (for icons), styled-components (for Loader)
+
+#### Backend:  
+[![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)  
+[![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)  
+**Libraries:** Scikit-Learn, Pandas, NumPy, requests, Jupyter Notebook
+
+
 ### Project Structure
 ```
 /root  
@@ -41,20 +54,6 @@ You can now use SpotiType [here](https://spotitype.vercel.app)!
 │  └── app.py                   # Flask app  
 └── README.md  
 ```
-
-
-### Technologies
-
-#### Frontend:  
-[![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)  
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)  
-**Libraries:** Recharts, Lucide (for icons), styled-components (for Loader)
-
-#### Backend:  
-[![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)  
-[![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)  
-**Libraries:** Scikit-Learn, Pandas, NumPy, requests, Jupyter Notebook
-
 
 
 ### Contributing

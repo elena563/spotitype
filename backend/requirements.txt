@@ -6,3 +6,5 @@ flask
 flask-cors
 dotenv
 requests
+seaborn
+matplotlib
