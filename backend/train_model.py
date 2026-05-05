@@ -11,40 +11,42 @@ MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models/random_forest.pkl')
 DATA_PATH = os.path.join(os.path.dirname(__file__), 'data/clustered_data.csv')
 
 if __name__ == "__main__":
+    try:
+        # preparing and splitting data 
+        df = pd.read_csv(DATA_PATH)
+        features = ['danceability', 'energy', 'valence', 'acousticness', 'instrumentalness']
+        X = df[features]
+        y = df['cluster']
+        X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2, random_state=42)
 
-    # preparing and splitting data 
-    df = pd.read_csv(DATA_PATH)
-    features = ['danceability', 'energy', 'valence', 'acousticness', 'instrumentalness']
-    X = df[features]
-    y = df['cluster']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2, random_state=42)
+        model = RandomForestClassifier(n_estimators=100, max_depth=10, min_samples_leaf=5, random_state=42)
+        model.fit(X_train, y_train)
 
-    model = RandomForestClassifier(n_estimators=100, max_depth=10, min_samples_leaf=5, random_state=42)
-    model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
 
+        # overfitting check
+        train_pred = model.predict(X_train)
+        train_acc = accuracy_score(y_train, train_pred)
+        test_acc = accuracy_score(y_test, y_pred)
 
-    y_pred = model.predict(X_test)
+        importances = model.feature_importances_
+        for name, importance in zip(features, importances):
+            print(f"{name}: {importance:.3f}")
 
-    # overfitting check
-    train_pred = model.predict(X_train)
-    train_acc = accuracy_score(y_train, train_pred)
-    test_acc = accuracy_score(y_test, y_pred)
+        print(f"Train acc: {train_acc:.2f}")
+        print(f"Test acc: {test_acc:.2f}")
 
-    importances = model.feature_importances_
-    for name, importance in zip(features, importances):
-        print(f"{name}: {importance:.3f}")
+        # cross-validation
+        scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+        print(f"CV Accuracy: {scores.mean():.2f} (+/- {scores.std():.2f})")
 
-    print(f"Train acc: {train_acc:.2f}")
-    print(f"Test acc: {test_acc:.2f}")
+        print(classification_report(y_test, y_pred))
 
-    # cross-validation
-    scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
-    print(f"CV Accuracy: {scores.mean():.2f} (+/- {scores.std():.2f})")
-
-    print(classification_report(y_test, y_pred))
-
-    with open(MODEL_PATH, 'wb') as f:
-        pickle.dump(model, f)
-
-    # Accuracy with cross-validation: 0.95
+        with open(MODEL_PATH, 'wb') as f:
+            pickle.dump(model, f)
+        # Accuracy with cross-validation: 0.95
+        print("Training completed successfully.")
+        
+    except Exception as e:
+        print(f"Training error: {e}")
 

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request
+from flask import Flask, request
 from flask_cors import CORS
 from flask import jsonify
 import pickle
@@ -24,46 +24,68 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
+class APIError(Exception):
+    def __init__(self, message, status_code=400):
+        super().__init__(message)
+        self.message = message
+        self.status_code = status_code
+
+@app.errorhandler(APIError)
+def handle_api_error(error):
+    return jsonify({"error": error.message}), error.status_code
+
 @app.route("/", methods=["GET", "POST"])
 def index():
-    if request.method == "GET":
-        return "OK", 200
-    data = request.get_json()
+    try:
+        if request.method == "GET":
+            # frontend is set in react
+            return "OK", 200
+        
+        data = request.get_json()
+        if not data:
+            raise APIError("Missing data", 400)
+        
+        form_type = data.get('form_type')
+        if form_type not in ['playlist_form', 'songs_form']:
+            raise APIError("Invalid or missing form_type", 400)
+
+        if form_type == 'playlist_form':
+            playlist_url = data.get('playlistField')
+
+            playlist_id = playlist_url.split("/")[-1].split("?")[0]
+
+            tracks = get_from_playlist(playlist_id)
+            if tracks is None or len(tracks) == 0:
+                raise APIError("Playlist URL is invalid or playlist is empty", 400)
+
+        elif form_type == 'songs_form':
+            songs = [data.get('song1'),
+                    data.get('song2'),
+                    data.get('song3'),
+                    data.get('song4'),
+                    data.get('song5')]
+            tracks = []
+            for title in songs:
+                track = search_track(title) 
+                if track:
+                    tracks.append(track)
+                else:
+                    raise APIError("At least one song was not found", 400)
+                
+        X_test = get_features_dataframe(tracks)
+        if not X_test:
+            raise APIError("Error in getting features", 400)
+        X_test1= X_test.drop(columns=['liveness', 'speechiness', 'tempo'])
+        X_test_avg = X_test1.mean().to_frame().T
+        y_pred = model.predict(X_test_avg)          # output will be 0, 1, 2, 3, 4 or 5
+
+        features_dict = X_test_avg.iloc[0].to_dict()
+
+        return jsonify({"result": y_pred[0].item(), "features": features_dict})
     
-    form_type = data.get('form_type')
-
-    if form_type == 'playlist_form':
-        playlist_url = data.get('playlistField')
-
-        playlist_id = playlist_url.split("/")[-1].split("?")[0]
-
-        tracks = get_from_playlist(playlist_id)
-        if tracks is None or len(tracks) == 0:
-                return jsonify({"error": "Playlist URL is invalid or playlist is empty"}), 400
-
-    elif form_type == 'songs_form':
-        songs = [data.get('song1'),
-                data.get('song2'),
-                data.get('song3'),
-                data.get('song4'),
-                data.get('song5')]
-        tracks = []
-        for title in songs:
-            track = search_track(title) 
-            if track:
-                tracks.append(track)
-            else:
-                return jsonify({"error": "At least one song was not found"}), 400
-
-            
-    X_test = get_features_dataframe(tracks)
-    X_test1= X_test.drop(columns=['liveness', 'speechiness', 'tempo'])
-    X_test_avg = X_test1.mean().to_frame().T
-    y_pred = model.predict(X_test_avg) # output will be 0, 1, 2, 3, 4 or 5
-
-    features_dict = X_test_avg.iloc[0].to_dict()
-
-    return jsonify({"result": y_pred[0].item(), "features": features_dict})
+    except Exception as e:
+        print(f"Internal server error: {e}")
+        return jsonify({"error": "Internal server error"}), 500
     
 #if __name__ == "__main__":
 #    app.run(debug=True)

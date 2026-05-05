@@ -43,25 +43,30 @@ sp2 = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
 def get_from_playlist(playlist_id):
     try:
         results = sp.playlist_tracks(playlist_id)
-    except SpotifyException:
+    except SpotifyException as e:
+        print(f"Spotify error: {e}")
         return None
     tracks = results['items']
 
     track_ids = []
     for item in tracks:
         track = item['track']
-        if track:  # None check 
+        if track:  # None check, if none skip track 
             track_ids.append(track['id'])
 
     return track_ids
 
 
 def search_track(title):
-    results = sp2.search(q=title, limit=1, type='track')
-    items = results.get('tracks', {}).get('items', [])
-    if not items:
+    try:
+        results = sp2.search(q=title, limit=1, type='track')
+        items = results.get('tracks', {}).get('items', [])
+        if not items:
+            return None
+        return items[0]['id']
+    except Exception as e:
+        print(f"Spotify search error: {e}")
         return None
-    return items[0]['id']
 
 def chunk_list(lst, n):
     for i in range(0, len(lst), n):
@@ -80,17 +85,16 @@ def get_features_dataframe(ids_list):
             response = requests.get(url, params=params, timeout=15)
             response.raise_for_status()
         except requests.exceptions.Timeout:
-            print("Timeout nella richiesta iniziale a Reccobeats.")
+            print("Timeout in request to Reccobeats.")
             return None
         except requests.exceptions.RequestException as e:
-            print(f"Errore nella richiesta: {e}")
+            print(f"Error in request: {e}")
             return None
 
         info = response.json()
-    
 
-        for traccia in info['content']:
-            rb_id = traccia['id']
+        for track in info['content']:
+            rb_id = track['id']
             url_feat = f'https://api.reccobeats.com/v1/track/{rb_id}/audio-features'
             headers = { 'Accept': 'application/json' }
             r = requests.get(url_feat, headers=headers)
@@ -98,7 +102,7 @@ def get_features_dataframe(ids_list):
                 feat = r.json()
                 all_features.append(feat)
             else:
-                print(f"Errore per traccia {rb_id}: {r.status_code}")
+                print(f"Error for track {rb_id}: {r.status_code}")
 
     if all_features:
         df = pd.DataFrame(all_features)
@@ -109,12 +113,16 @@ def get_features_dataframe(ids_list):
                 df[col] = 0
         df = df[features]
     else:
-        print("Nessuna feature trovata")
+        print("No features found")
         return None
 
     # data scaling
-    with open(MODEL_PATH, 'rb') as f:
-        scaler = pickle.load(f)
+    try:
+        with open(MODEL_PATH, 'rb') as f:
+            scaler = pickle.load(f)
+    except Exception as e:
+        print(f"Scaler loading error: {e}")
+        return None
 
     df_scaled = scaler.transform(df)
 

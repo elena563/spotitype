@@ -9,8 +9,9 @@ However, Spotify's function for audio features was recently deprecated, so the [
 
 
 ### App Usage
-You can now use SpotiType [here](https://spotitype.vercel.app)!
+You can now use SpotiType UI [here](https://spotitype.vercel.app)!
 
+If you want to try clustering and training the model on your own, you can clone the repo and run scripts locally.
 
 ### Technologies
 
