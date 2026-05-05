@@ -10,7 +10,10 @@ app = Flask(__name__)
 CORS(app)
 app.debug = True
 
-file = os.path.join(os.path.dirname(__file__), 'models/random_forest.pkl')
+# load machine learning model
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models/random_forest.pkl')
+with open(MODEL_PATH, 'rb') as f:
+    model = pickle.load(f)
 
 # prevent caching
 @app.after_request
@@ -28,9 +31,6 @@ def index():
     data = request.get_json()
     
     form_type = data.get('form_type')
-    with open(file, 'rb') as f:
-        model = pickle.load(f)
-
 
     if form_type == 'playlist_form':
         playlist_url = data.get('playlistField')

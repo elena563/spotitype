@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
@@ -5,20 +6,21 @@ import pickle
 from sklearn.decomposition import PCA
 import seaborn as sns
 
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models/cluster_model.pkl')
+NEW_DATA_PATH = os.path.join(os.path.dirname(__file__), 'data/clustered_data.csv')
+
 def run_clustering(data_path, n_clusters):
     df = pd.read_csv(data_path)
 
     model = KMeans(n_clusters=n_clusters, random_state=42)
     labels = model.fit_predict(df)
-
     df['cluster'] = labels
 
-    with open('models/cluster_model.pkl', 'wb') as f:
+    with open(MODEL_PATH, 'wb') as f:
         pickle.dump(model, f)
 
     # save clustering
-    df.to_csv('data/clustered_data.csv', index=False)
-
+    df.to_csv(NEW_DATA_PATH, index=False)
 
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(df)

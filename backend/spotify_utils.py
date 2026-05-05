@@ -9,6 +9,8 @@ import pickle
 import requests
 from dotenv import load_dotenv
 
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models/scaler.pkl')
+
 load_dotenv()
 client_id = os.getenv('CLIENT_ID')
 client_secret = os.getenv('CLIENT_SECRET')
@@ -111,7 +113,7 @@ def get_features_dataframe(ids_list):
         return None
 
     # data scaling
-    with open('models/scaler.pkl', 'rb') as f:
+    with open(MODEL_PATH, 'rb') as f:
         scaler = pickle.load(f)
 
     df_scaled = scaler.transform(df)
