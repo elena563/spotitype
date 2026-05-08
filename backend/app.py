@@ -5,7 +5,7 @@ from flask import jsonify
 import pickle
 from marshmallow import ValidationError
 
-from spotify_utils import get_from_playlist, search_track, get_features_dataframe
+from music_utils import search_track, get_from_playlist, get_features_dataframe
 from schemas import PlaylistFormSchema, SongsFormSchema
 
 # configure application
@@ -35,7 +35,11 @@ class APIError(Exception):
 
 @app.errorhandler(APIError)
 def handle_api_error(error):
-    return jsonify({"error": error.message}), error.status_code
+    response_data = {
+        "message": "Invalid input",
+        "details": error.message
+    }
+    return jsonify(response_data), error.status_code
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -44,7 +48,7 @@ def index():
             # frontend is set in react
             return "OK", 200
         
-        data = request.get_json()
+        data = request.get_json(silent=True)
         if not data:
             raise APIError("Missing data", 400)
         
@@ -56,13 +60,13 @@ def index():
             try:
                 validated = PlaylistFormSchema().load(data)
             except ValidationError as err:
-                raise APIError(f"Invalid input: {err.messages}", 400)
+                raise APIError(err.messages, 400)
             
             playlist_url = validated['playlistField']
 
             playlist_id = playlist_url.split("/")[-1].split("?")[0]
 
-            tracks = get_from_playlist(playlist_id)
+            tracks = get_from_playlist(playlist_url)
             if tracks is None or len(tracks) == 0:
                 raise APIError("Playlist URL is invalid or playlist is empty", 400)
 
@@ -76,13 +80,17 @@ def index():
             tracks = []
             for title in songs:
                 track = search_track(title) 
-                if track:
-                    tracks.append(track)
+                isrc = track['isrc']
+                if isrc is not None:
+                    tracks.append(isrc)
                 else:
+                    print(track)
+                    print(isrc)
+                    print(title)
                     raise APIError("At least one song was not found", 400)
                 
         X_test = get_features_dataframe(tracks)
-        if not X_test:
+        if X_test.empty:
             raise APIError("Error in getting features", 400)
         X_test1= X_test.drop(columns=['liveness', 'speechiness', 'tempo'])
         X_test_avg = X_test1.mean().to_frame().T
@@ -91,6 +99,9 @@ def index():
         features_dict = X_test_avg.iloc[0].to_dict()
 
         return jsonify({"result": y_pred[0].item(), "features": features_dict})
+    
+    except APIError:
+        raise
     
     except Exception as e:
         print(f"Internal server error: {e}")

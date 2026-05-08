@@ -25,13 +25,10 @@ adapter = HTTPAdapter(max_retries=3)
 session.mount('https://', adapter)
 session.mount('http://', adapter)
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
     client_id=client_id,
-    client_secret=client_secret,
-    redirect_uri="http://127.0.0.1:8888/callback",
-    scope="user-library-read"
-    ),
-    requests_session=session
+    client_secret=client_secret
+    )
 )
 
 sp2 = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
@@ -40,7 +37,7 @@ sp2 = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
 ))
 
 
-def get_from_playlist(playlist_id):
+def old_get_from_playlist(playlist_id):
     try:
         results = sp.playlist_tracks(playlist_id)
     except SpotifyException as e:
@@ -57,7 +54,7 @@ def get_from_playlist(playlist_id):
     return track_ids
 
 
-def search_track(title):
+def old_search_track(title):
     try:
         results = sp2.search(q=title, limit=1, type='track')
         items = results.get('tracks', {}).get('items', [])
@@ -67,63 +64,3 @@ def search_track(title):
     except Exception as e:
         print(f"Spotify search error: {e}")
         return None
-
-def chunk_list(lst, n):
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
-
-def get_features_dataframe(ids_list):
-    all_features = []
-
-    for chunk in chunk_list(ids_list, 40):
-        url = "https://api.reccobeats.com/v1/track"
-        params = {
-            "ids": chunk 
-        }
-
-        try:
-            response = requests.get(url, params=params, timeout=15)
-            response.raise_for_status()
-        except requests.exceptions.Timeout:
-            print("Timeout in request to Reccobeats.")
-            return None
-        except requests.exceptions.RequestException as e:
-            print(f"Error in request: {e}")
-            return None
-
-        info = response.json()
-
-        for track in info['content']:
-            rb_id = track['id']
-            url_feat = f'https://api.reccobeats.com/v1/track/{rb_id}/audio-features'
-            headers = { 'Accept': 'application/json' }
-            r = requests.get(url_feat, headers=headers)
-            if r.status_code == 200:
-                feat = r.json()
-                all_features.append(feat)
-            else:
-                print(f"Error for track {rb_id}: {r.status_code}")
-
-    if all_features:
-        df = pd.DataFrame(all_features)
-        features = ['danceability', 'energy', 'valence', 'acousticness', 'instrumentalness', 'liveness', 'speechiness', 'tempo']
-
-        for col in features:
-            if col not in df.columns:
-                df[col] = 0
-        df = df[features]
-    else:
-        print("No features found")
-        return None
-
-    # data scaling
-    try:
-        with open(MODEL_PATH, 'rb') as f:
-            scaler = pickle.load(f)
-    except Exception as e:
-        print(f"Scaler loading error: {e}")
-        return None
-
-    df_scaled = scaler.transform(df)
-
-    return pd.DataFrame(df_scaled, columns=features)
