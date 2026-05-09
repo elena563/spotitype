@@ -34,7 +34,7 @@ function UploadForm() {
     {
       color: "violet",
       title: "The Night Soul",
-      description: "Mysterious and magnetic, as a listener you are drawn to depth and emotion. You seek moody, atmospheric tracks with a touch of sensuality—music that feels nocturnal, intimate, and a little rebellious.",
+      description: "Mysterious and magnetic, as a listener you are drawn to depth and emotion. You seek moody, atmospheric tracks with a touch of sensuality, music that feels nocturnal, intimate, and a little rebellious.",
       songs: (
         <>
           Sam Smith, Kim Petras - Unholy<br />
@@ -70,7 +70,7 @@ function UploadForm() {
     {
       color: "orange",
       title: "The Party Animal",
-      description: "Always ready for the next big beat. You seek high-energy tracks with loud, fast-paced rhythms and minimal acoustic elements—perfect for dancing, partying, and keeping the vibes high.",
+      description: "Always ready for the next big beat. You seek high-energy tracks with loud, fast-paced rhythms and minimal acoustic elements: perfect for dancing, partying, and keeping the vibes high.",
       songs: (
         <>
           Quevedo, Bizarrap - Quevedo Bzrp Music Sessions, Vol. 52<br />
@@ -96,11 +96,13 @@ function UploadForm() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSongs(prev => ({ ...prev, [name]: value }));
+    setError("");
   };
 
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
     let payload = { form_type: activeTab };
 
@@ -118,7 +120,7 @@ function UploadForm() {
 
     }
 
-    fetch("https://spotitype.onrender.com", {
+    fetch(import.meta.env.VITE_BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -136,7 +138,8 @@ function UploadForm() {
     }
 
       if (!res.ok) {
-        setError(data.error || "Something went wrong.");
+        console.log("Errore backend:", data);
+        setError(data.details || data.message || data.error || "Something went wrong.");
         setResult(null);
         setFeatures(null);
       } else {
@@ -162,13 +165,13 @@ function UploadForm() {
         <div className="flex gap-2 mb-4 p-2 bg-[#282b2e] w-[80%] rounded-lg">
           <button
             className={`flex gap-2 items-center justify-center px-4 py-2 w-[50%] rounded ${activeTab === 'playlist_form' ? 'bg-[#1DB954] text-white' : 'bg-[#282b2e] text-[#ff00ba]'}`}
-            onClick={() => setActiveTab('playlist_form')}
+            onClick={() => {setActiveTab('playlist_form'); setError("");}}
           >
             <CirclePlay /> Spotify Playlist 
           </button>
           <button
             className={`flex gap-2 items-center justify-center px-4 py-2 w-[50%] rounded ${activeTab === 'songs_form' ? 'bg-[#1DB954] text-white' : 'bg-[#282b2e] text-[#ff00ba]'}`}
-            onClick={() => setActiveTab('songs_form')}
+            onClick={() => {setActiveTab('songs_form'); setError("");}}
           >
             <Music /> Favorite Songs
           </button>

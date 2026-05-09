@@ -9,7 +9,7 @@ const ResultChart = ({ features }) => {
     { subject: 'I', value: features.instrumentalness },
     { subject: 'A', value: features.acousticness },
   ];
-  console.log(data);
+  //console.log(data);
 
   return (
     <RadarChart outerRadius={180} width={400} height={450} data={data}>

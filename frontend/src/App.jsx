@@ -8,7 +8,7 @@ function App() {
       <header className="p-6 text-[#1DB954]">
         <h2 className="text-left kanit-bold text-2xl">SpotiType</h2>
       </header>
-      <main className="bg-[url(../public/bg.png)] text-gray-100 px-6 py-40">
+      <main className="h-[80vh] bg-[url(../public/bg.png)] text-gray-100 px-6 flex flex-col justify-center">
         <h1 className="kanit-black text-7xl mb-8">What <span className="text-[#1DB954]">type</span> of listener are you?</h1>
         <p className="font-semibold text-2xl text-gray-300">Discover what your favorite songs tell about you!</p>
       </main>
