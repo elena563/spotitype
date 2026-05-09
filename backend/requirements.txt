@@ -9,3 +9,4 @@ requests
 seaborn
 matplotlib
 marshmallow
+spotify_scraper

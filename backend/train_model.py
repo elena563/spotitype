@@ -1,4 +1,5 @@
 import os
+import sys
 from sklearn.model_selection import train_test_split
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -13,7 +14,8 @@ DATA_PATH = os.path.join(os.path.dirname(__file__), 'data/clustered_data.csv')
 if __name__ == "__main__":
     try:
         # preparing and splitting data 
-        df = pd.read_csv(DATA_PATH)
+        data_path = sys.argv[1] if len(sys.argv) > 1 else DATA_PATH     # to use test data
+        df = pd.read_csv(data_path)
         features = ['danceability', 'energy', 'valence', 'acousticness', 'instrumentalness']
         X = df[features]
         y = df['cluster']

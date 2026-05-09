@@ -17,6 +17,7 @@ def preprocess_data(input_path, output_path, features_to_use):
             pickle.dump(scaler, f)
 
         pd.DataFrame(X_scaled, columns=features_to_use).to_csv(output_path, index=False)
+        print(type(X_scaled))
         return X_scaled
     except Exception as e:
         print(f"Preprocessing error: {e}")

@@ -1,15 +1,15 @@
 # SpotiType
 
-SpotiType is a web application that, given a Spotify playlist or a list of 5 songs, can tell you what kind of listener you are.
+SpotiType is a web application that, given a playlist or a list of 5 songs, can tell you what kind of listener you are.
 
 The frontend is made with ReactJS, the backend uses a machine learning model (Random Forest Classifier) trained on [Kaggle Spotify Tracks Dataset](https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset), labelled through a K-Means clustering.  
 (Soon I will experiment and improve this ML part, stay tuned!)
 
-Songs data are extracted through different open APIs. I had to change all the infrastructure, since Spotify's API for songs search is not free anymore.
-- [Spotifyscraper](https://spotifyscraper.readthedocs.io/en/latest/) package to get songs ids list from playlists
+Songs data are extracted through different open APIs. All the infrastructure was changed, since Spotify's API for songs search is not free anymore.
+- [SpotifyScraper](https://spotifyscraper.readthedocs.io/en/latest/) package to get songs ids list from playlists. At the moment, only Spotify playlists are supported, but I will add support for other platforms in the future.
 - [Deezer API](https://developers.deezer.com/api) to get songs data and extract their ISRC id
 - [ReccoBeats API](https://reccobeats.com/docs/apis/reccobeats-api) was used to obtain audio feature values
-Spotify functions script will be maintained with old_ prefix, just in case Spotify's API becomes free again, so that the app can be easily switched back to it.
+Spotify functions will be maintained with old_ prefix, just in case Spotify's API becomes free again, so that the app can be easily switched back to it.
 
 
 ### App Usage
@@ -51,8 +51,10 @@ If you want to try clustering and training the model on your own, you can clone 
 │  ├── notebooks/  
 │  │  ├── eda.ipynb             # exploratory analysis of variables  
 │  │  └── ca.ipynb              # clusters analysis and interpretation  
-│  ├── tests/  
-│  │  └── test_app.py          # unit tests for Flask app
+│  ├── tests/                   # unit tests
+│  │  ├── test_app.py
+│  │  ├── test_music_utils.py
+│  │  └── test_ml_functions.py
 │  ├── preprocess.py    
 │  ├── clustering.py  
 │  ├── main.py                  # run preprocess and clustering  

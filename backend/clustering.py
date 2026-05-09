@@ -9,7 +9,7 @@ import seaborn as sns
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models/cluster_model.pkl')
 NEW_DATA_PATH = os.path.join(os.path.dirname(__file__), 'data/clustered_data.csv')
 
-def run_clustering(data_path, n_clusters):
+def run_clustering(data_path, n_clusters, plot=False):
     try:
         df = pd.read_csv(data_path)
 
@@ -23,13 +23,14 @@ def run_clustering(data_path, n_clusters):
         # save clustering
         df.to_csv(NEW_DATA_PATH, index=False)
 
-        pca = PCA(n_components=2)
-        X_pca = pca.fit_transform(df)
-        df_viz = pd.DataFrame(X_pca, columns=['PC1', 'PC2'])
-        df_viz['cluster'] = labels
+        if plot:
+            pca = PCA(n_components=2)
+            X_pca = pca.fit_transform(df)
+            df_viz = pd.DataFrame(X_pca, columns=['PC1', 'PC2'])
+            df_viz['cluster'] = labels
 
-        sns.scatterplot(data=df_viz, x='PC1', y='PC2', hue='cluster', palette='Set2')
-        plt.show() 
+            sns.scatterplot(data=df_viz, x='PC1', y='PC2', hue='cluster', palette='Set2')
+            plt.show() 
 
         return df
 
