@@ -3,11 +3,13 @@
 SpotiType is a web application that, given a Spotify playlist or a list of 5 songs, can tell you what kind of listener you are.
 
 The frontend is made with ReactJS, the backend uses a machine learning model (Random Forest Classifier) trained on [Kaggle Spotify Tracks Dataset](https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset), labelled through a K-Means clustering.  
+(Soon I will experiment and improve this ML part, stay tuned!)
 
-Unfortunately, it seems that Spotify is not supporting open source software anymore!
-Given that, at the moment, this is a project for learning purposes, I will keep it open source, so I switched from Spotify API to
-To obtain user's playlists or songs for testing the model, it uses Spotify API from [Spotify for Developers](https://developer.spotify.com/).
-However, Spotify's function for audio features was recently deprecated, so the [ReccoBeats API](https://reccobeats.com/docs/apis/reccobeats-api) was used to extract values.
+Songs data are extracted through different open APIs. I had to change all the infrastructure, since Spotify's API for songs search is not free anymore.
+- [Spotifyscraper](https://spotifyscraper.readthedocs.io/en/latest/) package to get songs ids list from playlists
+- [Deezer API](https://developers.deezer.com/api) to get songs data and extract their ISRC id
+- [ReccoBeats API](https://reccobeats.com/docs/apis/reccobeats-api) was used to obtain audio feature values
+Spotify functions script will be maintained with old_ prefix, just in case Spotify's API becomes free again, so that the app can be easily switched back to it.
 
 
 ### App Usage
@@ -49,11 +51,14 @@ If you want to try clustering and training the model on your own, you can clone 
 │  ├── notebooks/  
 │  │  ├── eda.ipynb             # exploratory analysis of variables  
 │  │  └── ca.ipynb              # clusters analysis and interpretation  
+│  ├── tests/  
+│  │  └── test_app.py          # unit tests for Flask app
 │  ├── preprocess.py    
 │  ├── clustering.py  
 │  ├── main.py                  # run preprocess and clustering  
 │  ├── train_model.py  
-│  ├── spotify_utils.py         # API calls for Spotify and ReccoBeats  
+│  ├── music_utils.py           # functions to get songs data from APIs
+│  ├── spotify_utils.py         # old Spotify API functions, not used anymore  
 │  └── app.py                   # Flask app  
 └── README.md  
 ```

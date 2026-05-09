@@ -6,6 +6,7 @@ import pandas as pd
 import pickle
 import requests
 from dotenv import load_dotenv
+from difflib import SequenceMatcher
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models/scaler.pkl')
 
@@ -27,7 +28,6 @@ RECCO_BASE = "https://api.reccobeats.com/v1"
 
 
 def get_from_playlist(playlist_url: str):
-    #playlist_url = f"https://open.spotify.com/playlist/{playlist_id}"
 
     client = SpotifyClient()
 
@@ -49,37 +49,20 @@ def get_from_playlist(playlist_url: str):
             continue
 
         spotify_track_id = uri.split(":")[-1]
-        title = track.get("name")
-        artists = track.get("artists", [])
-        artist_name = None
-
-        if artists:
-            artist_name = artists[0].get("name")
-
         extracted_tracks.append(spotify_track_id)
-
-    print(f"[get_from_playlist] ID estratti: {len(extracted_tracks)}")
 
     return extracted_tracks
 
+def similarity(a, b):
+    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
+
 def search_track(query: str):
-    """
-    Cerca una canzone usando Deezer.
-    
-    Ritorna:
-    - titolo
-    - artista
-    - isrc
-    - deezer_id
-    - preview
-    """
     artist = ""
     title = query.strip()
 
     if " - " in query:
         artist, title = query.split(" - ", 1)
 
-    # cleanup
     artist = artist.strip()
     title = title.strip()
 
@@ -102,7 +85,6 @@ def search_track(query: str):
     except requests.exceptions.Timeout:
         print("[search_track] Timeout Deezer")
         return None
-
     except requests.exceptions.RequestException as e:
         print(f"[search_track] Deezer request error: {e}")
         return None
@@ -110,12 +92,8 @@ def search_track(query: str):
     results = response.json().get("data", [])
 
     if not results:
-        print(f"[search_track] Nessun risultato Deezer per: {query}")
-
-        print("[search_track] Tentativo fallback...")
         # fallback
         try:
-
             fallback = requests.get(
                 "https://api.deezer.com/search/track",
                 params={
@@ -124,9 +102,7 @@ def search_track(query: str):
                 },
                 timeout=10
             )
-
             fallback.raise_for_status()
-
             results = fallback.json().get("data", [])
 
         except Exception as e:
@@ -134,10 +110,24 @@ def search_track(query: str):
             return None
 
         if not results:
-            print("[search_track] Nessun risultato anche col fallback")
+            print("[search_track] No result from fallback")
             return None
 
-    best = results[0]
+    # calculate similarity not to get random results for invalid queries
+    best = None
+    best_score = 0
+
+    for track in results:
+        candidate = f"{track.get('artist', {}).get('name', '')} - {track.get('title', '')}"
+        score = similarity(query, candidate)
+
+        if score > best_score:
+            best_score = score
+            best = track
+
+    if best_score < 0.55:
+        print("[search_track] No similar match found")
+        return None
 
     deezer_id = best.get("id")
     deezer_title = best.get("title")
@@ -148,20 +138,11 @@ def search_track(query: str):
     isrc = best.get("isrc")
 
     artist_data = best.get("artist", {})
-
     deezer_artist = artist_data.get("name")
     artist_id = artist_data.get("id")
-
     album_data = best.get("album", {})
-
     album_title = album_data.get("title")
     cover = album_data.get("cover_medium")
-
-
-    #print(f"[search_track] Match trovato")
-    #print(f"  Titolo: {deezer_title}")
-    #print(f"  ISRC: {isrc}")
-
 
     normalized_song = {
         "title": deezer_title,
@@ -230,7 +211,6 @@ def get_features_dataframe(ids_list):
                 all_features.append(feat)
             else:
                 print(f"Error for track {rb_id}: {r.status_code}")
-    print('all_features', all_features[:3])
 
     if all_features:
         df = pd.DataFrame(all_features)
@@ -244,8 +224,6 @@ def get_features_dataframe(ids_list):
         print("No features found")
         return None
     
-    print('df', df.head())
-
     # data scaling
     try:
         with open(MODEL_PATH, 'rb') as f:

@@ -80,12 +80,10 @@ def index():
             tracks = []
             for title in songs:
                 track = search_track(title) 
-                isrc = track['isrc']
-                if isrc is not None:
-                    tracks.append(isrc)
+                if track is not None and track['isrc'] is not None:
+                    tracks.append(track['isrc'])
                 else:
                     print(track)
-                    print(isrc)
                     print(title)
                     raise APIError("At least one song was not found", 400)
                 

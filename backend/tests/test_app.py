@@ -59,7 +59,7 @@ def test_index_song_not_found(client):
         'form_type': 'songs_form', 'song1': 'invalid-song', 'song2': 'The Weeknd - Blinding Lights', 'song3': 'Tom Odell - Another Love', 'song4': 'Ed Sheeran - Shape of You', 'song5': 'Ariana Grande - positions'
         })
     assert response.status_code == 400
-    assert b"At least one song not found" in response.data
+    assert b"At least one song was not found" in response.data
 
 def test_index_valid_playlist(client):
     response = client.post('/', json={
