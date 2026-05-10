@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CirclePlay, Music } from 'lucide-react';
 import Loader from './Loader';
 import Type from './Type';
+import typeData from '../data/typeData';
 
 function UploadForm() {
   const [activeTab, setActiveTab] = useState('playlist_form');
@@ -18,106 +19,48 @@ function UploadForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const typeData = [
-    {
-      color: "red",
-      title: "The Melancholy Dancer",
-      description: "A complex blend of rhythm and emotion. You love music with movement, yet your playlists reveal a subtle sadness or introspection beneath the surface, often favoring tracks that are danceable but emotionally layered.",
-      songs: (
-        <>
-          Cigarettes After Sex - Apocalypse<br />
-          Mitski - Washing Machine Heart<br />
-          Mac DeMarco - Chamber Of Reflection 
-        </>
-      )
-    },
-    {
-      color: "violet",
-      title: "The Night Soul",
-      description: "Mysterious and magnetic, as a listener you are drawn to depth and emotion. You seek moody, atmospheric tracks with a touch of sensuality, music that feels nocturnal, intimate, and a little rebellious.",
-      songs: (
-        <>
-          Sam Smith, Kim Petras - Unholy<br />
-          The Weeknd - Blinding Lights <br />
-          The Neighbourhood -  Sweater Weather
-        </>
-      )
-    },
-    {
-      color: "blue",
-      title: "The Deep Nostalgic",
-      description: "Emotionally connected to music that resonates with sadness, depth, and memory. You gravitate toward slower, acoustic-heavy tracks with strong emotional undertones, often reflecting on the past through sound.",
-      songs: (
-        <>
-          Tom Odell - Another Love<br />
-          Sam Smith - I'm Not The Only One<br />
-          Billie Eilish, Khalid - lovely 
-        </>
-      ) 
-    },
-    {
-      color: "green",
-      title: "The Bright Wanderer",
-      description: "Energetic yet balanced, you enjoy upbeat, positive tracks that are both danceable and emotionally warm. Your playlists often carry a sense of optimism, exploration, and light-hearted movement.",
-      songs: (
-        <>
-          Ed Sheeran - Shape of You<br />
-          Justin Bieber, Daniel Caesar, Giveon - Peaches<br />
-          Ariana Grande - positions
-        </>
-      )   
-    },
-    {
-      color: "orange",
-      title: "The Party Animal",
-      description: "Always ready for the next big beat. You seek high-energy tracks with loud, fast-paced rhythms and minimal acoustic elements: perfect for dancing, partying, and keeping the vibes high.",
-      songs: (
-        <>
-          Quevedo, Bizarrap - Quevedo Bzrp Music Sessions, Vol. 52<br />
-          Beyoncé - CUFF IT<br />
-          Nicki Minaj	- Super Freaky Girl 
-        </>
-      )  
-    },
-    {
-      color: "grey",
-      title: "The Ethereal Thinker",
-      description: "A quiet soul drawn to introspective and instrumental sounds. Your taste leans toward atmospheric, acoustic tracks with minimal lyrics, often preferring music that evokes space, thought, and emotion without the need for words.",
-      songs: (
-        <>
-          Billie Eilish - everything i wanted<br />
-          Yot Club - YKWIM?<br />
-          Tom Rosenthal - Lights Are On 
-        </>
-      )
-    }
-  ];
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSongs(prev => ({ ...prev, [name]: value }));
     setError("");
   };
 
+  const formatSong = (str) => {
+    let s = str.trim();
+    s = s.replace(/\s*-\s*/, " - ");
+    return s;
+  };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
+
+    // client side validation
+    if (activeTab === "playlist_form"){
+      if (playlistField.length === 0) {
+        setError("Insert a playlist URL");
+        return;
+      } else if (!playlistField.startsWith("https://open.spotify.com/playlist/")) {   //TODO: edit this if add other sources
+        setError("Inserisci un URL valido di una playlist Spotify.");
+        return;
+      }
+    } else if (activeTab === "songs_form") {
+      if (songs.song1.length === 0 || songs.song2.length === 0 || songs.song3.length === 0 || songs.song4.length === 0 || songs.song5.length === 0) {
+        setError("Insert at least 5 songs");
+        return;
+      }
+    }
+
     setLoading(true);
     let payload = { form_type: activeTab };
 
     if (activeTab === "playlist_form") {
-      payload.playlistField = playlistField;
+      payload.playlistField = playlistField.trim();
     } else if (activeTab === "songs_form") {
-      payload = {
-        ...payload,
-        song1: songs.song1,
-        song2: songs.song2,
-        song3: songs.song3,
-        song4: songs.song4,
-        song5: songs.song5,
-      };
-
+      ["song1", "song2", "song3", "song4", "song5"].forEach((key) => {
+        payload[key] = formatSong(songs[key]);
+      });
     }
 
     fetch(import.meta.env.VITE_BACKEND_URL, {
@@ -154,7 +97,7 @@ function UploadForm() {
       setError("Something went wrong.");
       setLoading(false);
     });
-};
+  };
 
 
   return (
@@ -194,51 +137,20 @@ function UploadForm() {
           {activeTab === 'songs_form' && (
             <div><p className="font-semibold text-2xl text-gray-100 mb-4">Your 5 favorite songs</p>
             <input type="hidden" name="form_type" value="songs_form" />
-              <p className="font-semibold text-lg text-gray-300 mb-2">Song 1</p>
-              <input
-              type="text"
-              name="song1"
-              placeholder="Artista - Titolo Canzone"
-              className="mb-4 w-full px-4 py-3 rounded bg-[#282b2e] text-[#ff00ba] placeholder-[#ff00ba]"
-              value={songs.song1}
-              onChange={handleChange} required
-            />
-            <p className="font-semibold text-lg text-gray-300 mb-2">Song 2</p>
-              <input
-              type="text"
-              name="song2"
-              placeholder="Artista - Titolo Canzone"
-              className="mb-4 w-full px-4 py-3 rounded bg-[#282b2e] text-[#ff00ba] placeholder-[#ff00ba]"
-              value={songs.song2}
-              onChange={handleChange} required
-            />
-            <p className="font-semibold text-lg text-gray-300 mb-2">Song 3</p>
-              <input
-              type="text"
-              name="song3"
-              placeholder="Artista - Titolo Canzone"
-              className="mb-4 w-full px-4 py-3 rounded bg-[#282b2e] text-[#ff00ba] placeholder-[#ff00ba]"
-              value={songs.song3}
-              onChange={handleChange} required
-            />
-            <p className="font-semibold text-lg text-gray-300 mb-2">Song 4</p>
-              <input
-              type="text"
-              name="song4"
-              placeholder="Artista - Titolo Canzone"
-              className="mb-4 w-full px-4 py-3 rounded bg-[#282b2e] text-[#ff00ba] placeholder-[#ff00ba]"
-              value={songs.song4}
-              onChange={handleChange} required
-            />
-            <p className="font-semibold text-lg text-gray-300 mb-2">Song 5</p>
-              <input
-              type="text"
-              name="song5"
-              placeholder="Artista - Titolo Canzone"
-              className="mb-4 w-full px-4 py-3 rounded bg-[#282b2e] text-[#ff00ba] placeholder-[#ff00ba]"
-              value={songs.song5}
-              onChange={handleChange} required
-            />
+              {["song1", "song2", "song3", "song4", "song5"].map((songKey, idx) => (
+                <div key={songKey}>
+                  <p className="font-semibold text-lg text-gray-300 mb-2">Song {idx + 1}</p>
+                  <input
+                    type="text"
+                    name={songKey}
+                    placeholder="Artista - Titolo Canzone"
+                    className="mb-4 w-full px-4 py-3 rounded bg-[#282b2e] text-[#ff00ba] placeholder-[#ff00ba]"
+                    value={songs[songKey]}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              ))}
             </div>
           )}
 

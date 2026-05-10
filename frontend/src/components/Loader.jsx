@@ -1,22 +1,42 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
+const phrases = [
+  "Analyzing your music...",
+  "Calculating your metrics...",
+  "Generating your results...",
+  "Just a moment..."
+];
+
 const Loader = () => {
+  const [phraseIdx, setPhraseIdx] = useState(0);
+
+  // change loading phrase
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPhraseIdx((prev) => (prev + 1) % phrases.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <StyledWrapper>
-      <ul className="wave-menu">
-        <li />
-        <li />
-        <li />
-        <li />
-        <li />
-        <li />
-        <li />
-        <li />
-        <li />
-        <li />
-      </ul>
-    </StyledWrapper>
+    <div className='flex flex-col items-center gap-6'>
+        <StyledWrapper>
+        <ul className="wave-menu">
+          <li />
+          <li />
+          <li />
+          <li />
+          <li />
+          <li />
+          <li />
+          <li />
+          <li />
+          <li />
+        </ul>
+      </StyledWrapper>
+      <p className='font-semibold text-2xl text-center text-gray-100'>{phrases[phraseIdx]}</p>
+    </div>
   );
 }
 
