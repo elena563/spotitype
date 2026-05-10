@@ -4,7 +4,7 @@ pandas
 spotipy
 flask
 flask-cors
-dotenv
+python-dotenv
 requests
 seaborn
 matplotlib
