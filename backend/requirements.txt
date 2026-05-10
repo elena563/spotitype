@@ -1,6 +1,7 @@
 gunicorn
-scikit-learn
+scikit-learn==1.6.1
 pandas
+numpy==2.0.0
 spotipy
 flask
 flask-cors
