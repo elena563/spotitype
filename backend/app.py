@@ -10,10 +10,7 @@ from schemas import PlaylistFormSchema, SongsFormSchema
 
 # configure application
 app = Flask(__name__)
-CORS(app, origins=[
-    "http://localhost:5173",
-    "https://spotitype.vercel.app"
-])
+CORS(app, origins="*")
 app.debug = True
 
 # load machine learning model
