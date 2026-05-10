@@ -3,7 +3,7 @@ import ResultChart from "./ResultChart";
 const Type = ({ features, data }) => {
 
     return(
-        <div style={{ backgroundImage: `url(../../../public/${data.color}.png)`, width: 'min(1000px, 90%)' }}
+        <div style={{ backgroundImage: `url(/${data.color}.png)`, width: 'min(1000px, 90%)' }}
             className="mx-auto p-10 rounded-xl text-left">
             <h2 className="kanit-black text-gray-100 text-5xl mb-4">{data.title}</h2>
             <div className="flex gap-4 justify-between items-start w-full">
